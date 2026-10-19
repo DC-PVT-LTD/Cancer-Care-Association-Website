@@ -1,0 +1,85 @@
+name: Production CI/CD - GHCR & CapRover
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Minimum necessary permissions for repository checkout and publishing images to GHCR
+permissions:
+  contents: read
+  packages: write
+
+# Prevent overlapping production deployments from deploying older commits after newer ones
+concurrency:
+  group: production-deployment
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    name: Build Docker Image & Deploy to CapRover
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Validate Deployment Configuration
+        run: |
+          echo "Checking required CapRover deployment secrets..."
+          MISSING_SECRETS=()
+          if [ -z "${{ secrets.CAPROVER_SERVER }}" ]; then
+            MISSING_SECRETS+=("CAPROVER_SERVER")
+          fi
+          if [ -z "${{ secrets.CAPROVER_APP }}" ]; then
+            MISSING_SECRETS+=("CAPROVER_APP")
+          fi
+          if [ -z "${{ secrets.CAPROVER_APP_TOKEN }}" ]; then
+            MISSING_SECRETS+=("CAPROVER_APP_TOKEN")
+          fi
+
+          if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
+            echo "::error::Deployment halted! Missing required GitHub Secrets: ${MISSING_SECRETS[*]}"
+            echo "Please navigate to: Repository Settings -> Secrets and variables -> Actions, and add the required secrets."
+            exit 1
+          fi
+          echo "All required deployment secrets are present."
+
+      - name: Prepare Lowercase Image Name
+        run: |
+          # Docker and GHCR repository names must be strictly lowercase
+          LOWER_REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=ghcr.io/${LOWER_REPO}" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL || '' }}
+
+      - name: Deploy Image to CapRover
+        uses: caprover/deploy-from-github@v1.1.2
+        with:
+          server: ${{ secrets.CAPROVER_SERVER }}
+          app: ${{ secrets.CAPROVER_APP }}
+          token: ${{ secrets.CAPROVER_APP_TOKEN }}
+          image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
