@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #1261A0;
+  --color-primary-dark: #092B4C;
+  --color-primary-light: #2585C6;
+  --color-accent-teal: #0D9488;
+  --color-accent-gold: #F59E0B;
+  --color-accent-gold-light: #FEF3C7;
+  --color-surface-alt: #F1F5F9;
+  --color-surface-soft: #F8FAFC;
+  --color-dark-text: #0F172A;
+  --color-muted-text: #64748B;
+  
+  --font-heading: var(--font-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #1261A0;
+  --primary-dark: #092B4C;
+  --accent-teal: #0D9488;
+  --accent-gold: #F59E0B;
+  --background: #FFFFFF;
+  --foreground: #0F172A;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+/* ipm.lk style design tokens */
+.top-bar-ipm {
+  background: #092B4C;
+  color: #E2E8F0;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.badge-teal-ipm {
+  background: #E6FFFA;
+  color: #0D9488;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(13, 148, 136, 0.2);
+}
+
+.badge-gold-ipm {
+  background: #FEF3C7;
+  color: #B45309;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.quote-highlight-ipm {
+  background: #F8FAFC;
+  border-left: 4px solid #0D9488;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 1rem 1rem 0;
+  margin: 1.5rem 0;
+}
+
+.bank-card-ipm {
+  background: linear-gradient(135deg, #092B4C 0%, #1261A0 100%);
+  color: #FFFFFF;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  box-shadow: 0 20px 35px -10px rgba(9, 43, 76, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-hover-ipm {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #E2E8F0;
+}
+
+.card-hover-ipm:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 30px -10px rgba(18, 97, 160, 0.12);
+  border-color: #93C5FD;
+}
+
+/* Smooth Focus */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #1261A0;
+  outline-offset: 2px;
 }
