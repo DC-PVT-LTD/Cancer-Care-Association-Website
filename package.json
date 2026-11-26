@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "predev": "node scripts/security-guard.js",
+    "prebuild": "node scripts/security-guard.js",
+    "prestart": "node scripts/security-guard.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
